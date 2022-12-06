@@ -6,15 +6,15 @@ import TicketDetail from './TicketDetail';
 
 class TicketControl extends React.Component {
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      formVisibleOnPage: false,
-      mainTicketList: [],
-      selectedTicket: null,
-      editing: false // new code
-    };  
-  }
+  // constructor(props) {
+  //   super(props);
+  //   this.state = {
+  //     formVisibleOnPage: false,
+  //     mainTicketList: [],
+  //     selectedTicket: null,
+  //     editing: false // new code
+  //   };  
+  // }
 
   /* Handles mouse-click events. */
   handleClick = () => {  
@@ -98,7 +98,7 @@ class TicketControl extends React.Component {
     return (
       <React.Fragment>
         {currentlyVisibleState}
-        <button onClick={this.handleClick}>{buttonText}</button> { /* new code */ }
+        <button onClick={this.handleClick}>{buttonText}</button>
       </React.Fragment>
     );
   }
