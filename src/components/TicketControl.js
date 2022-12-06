@@ -9,6 +9,8 @@ function TicketControl() {
 
   const [formVisibleOnPage, setFormVisibleOnPage] = useState(false);
   const [mainTicketList, setMainTicketList] = useState([]);
+  const [selectedTicket, setSelectedTicket] = useState(null);
+  const [editing, setEditing] = useState(false);
 
   // constructor(props) {
   //   super(props);
@@ -22,15 +24,12 @@ function TicketControl() {
 
   /* Handles mouse-click events. */
   const handleClick = () => {  
-    if (this.state.selectedTicket != null) {
-      //New code!
+    if (selectedTicket != null) {
       setFormVisibleOnPage(false);
-      this.setState({
-        formVisibleOnPage: false,
-        selectedTicket: null,
-      }); 
+      // new code!
+      setSelectedTicket(null);
+      setEditing(false);
     } else {
-      //New code!
       setFormVisibleOnPage(!formVisibleOnPage);
     }
   }
@@ -46,58 +45,61 @@ function TicketControl() {
 
   /* Handles selection of a ticket with a given ID. */
   const handleChangingSelectedTicket = (id) => {
-    const selectedTicket = this.state.mainTicketList.filter(ticket => ticket.id === id)[0];
-    this.setState({selectedTicket: selectedTicket});
+    // new code: updated variable name to 'selection'
+    // so there's no clash with the state variable 'selectedTicket'
+    const selection = mainTicketList.filter(ticket => ticket.id === id)[0];
+    // new code!
+    setSelectedTicket(selection);
   }
 
   /* Handles deletion of a given ticket. */
   const handleDeletingTicket = (id) => {
-    // new code!
     const newMainTicketList = mainTicketList.filter(ticket => ticket.id !== id);
     setMainTicketList(newMainTicketList);
-    // this.setState({
-    //   mainTicketList: newMainTicketList,
-    //   selectedTicket: null
-    // });
+    // new code!
+    setSelectedTicket(null);
   }
 
   /* Handles showing the Edit form for a given ticket. */ 
   const handleEditClick = () => {
-    this.setState({editing: true});
+    // new code!
+    setEditing(true);
   }
 
   /* This method allows a given ticket to be Updated/Edited using the Edit form. */
   const handleEditingTicketInList = (ticketToEdit) => {
-    // new code!
     const editedMainTicketList = mainTicketList
-      .filter(ticket => ticket.id !== this.state.selectedTicket.id)
-      .concat(ticketToEdit);
-    // new code!
+    // new code: selectedTicket.id
+    .filter(ticket => ticket.id !== selectedTicket.id)
+    .concat(ticketToEdit);
     setMainTicketList(editedMainTicketList);
-    // this.setState({
-    //   mainTicketList: editedMainTicketList,
-    //   editing: false,
-    //   selectedTicket: null
-    // });
+    // new code!
+    setEditing(false);
+    setSelectedTicket(null);
   }
 
   let currentlyVisibleState = null;
   let buttonText = null; 
   
-  if (this.state.editing ) {      
-    currentlyVisibleState = <EditTicketForm ticket = {this.state.selectedTicket} onEditTicket = {this.handleEditingTicketInList} />  //Passes methods down to 'EditTicketForm' component as Props. 
-    buttonText = "Return to Ticket List";
-  } else if (this.state.selectedTicket != null) {
+  if (editing) {      
     currentlyVisibleState = 
-    <TicketDetail 
-      ticket = {this.state.selectedTicket} 
-      onClickingDelete = {this.handleDeletingTicket} 
-      onClickingEdit = {this.handleEditClick} />
+      <EditTicketForm     
+        ticket = {selectedTicket} 
+        onEditTicket = {this.handleEditingTicketInList} />;
     buttonText = "Return to Ticket List";
-  //Removed 'this.state'
+
+  } else if (selectedTicket != null) {
+    currentlyVisibleState = 
+      <TicketDetail 
+        ticket={selectedTicket} 
+        onClickingDelete={this.handleDeletingTicket}
+        onClickingEdit = {this.handleEditClick} />;
+    buttonText = "Return to Ticket List";
+
   } else if (formVisibleOnPage) {
     currentlyVisibleState = <NewTicketForm onNewTicketCreation={this.handleAddingNewTicketToList}  />;
     buttonText = "Return to Ticket List";
+
   } else {
     currentlyVisibleState = 
       <TicketList 
