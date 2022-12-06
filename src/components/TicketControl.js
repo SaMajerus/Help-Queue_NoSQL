@@ -4,8 +4,8 @@ import TicketList from './TicketList';
 import EditTicketForm from './EditTicketForm';
 import TicketDetail from './TicketDetail';
 // new import!
+import { collection, addDoc, onSnapshot } from "firebase/firestore"; 
 import db from './../firebase.js';
-import { collection, addDoc } from "firebase/firestore";  //Allows us to format a POST request to Firestore
 
 function TicketControl() {
 
@@ -24,6 +24,25 @@ function TicketControl() {
   //   };  
   // }
 
+  useEffect(() => { 
+    const unSubscribe = onSnapshot(
+      collection(db, "tickets"), 
+      (collectionSnapshot) => {
+        // do something with ticket data
+      }, 
+      (error) => {
+        // do something with error
+      }
+    );
+
+    return () => unSubscribe();  //"Unsubscribe" in this context means to "stop the database listener" (Lsn 13).  
+  }, []); 
+
+
+
+
+
+  
   /* Handles mouse-click events. */
   const handleClick = () => {  
     if (selectedTicket != null) {
