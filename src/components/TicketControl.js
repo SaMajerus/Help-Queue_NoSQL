@@ -85,25 +85,25 @@ function TicketControl() {
     currentlyVisibleState = 
       <EditTicketForm     
         ticket = {selectedTicket} 
-        onEditTicket = {this.handleEditingTicketInList} />;
+        onEditTicket = {.handleEditingTicketInList} />;
     buttonText = "Return to Ticket List";
 
   } else if (selectedTicket != null) {
     currentlyVisibleState = 
       <TicketDetail 
         ticket={selectedTicket} 
-        onClickingDelete={this.handleDeletingTicket}
-        onClickingEdit = {this.handleEditClick} />;
+        onClickingDelete={.handleDeletingTicket}
+        onClickingEdit = {.handleEditClick} />;
     buttonText = "Return to Ticket List";
 
   } else if (formVisibleOnPage) {
-    currentlyVisibleState = <NewTicketForm onNewTicketCreation={this.handleAddingNewTicketToList}  />;
+    currentlyVisibleState = <NewTicketForm onNewTicketCreation={.handleAddingNewTicketToList}  />;
     buttonText = "Return to Ticket List";
 
   } else {
     currentlyVisibleState = 
       <TicketList 
-        onTicketSelection={this.handleChangingSelectedTicket} 
+        onTicketSelection={.handleChangingSelectedTicket} 
         // new code!
         ticketList={mainTicketList} />;
     buttonText = "Add Ticket"; 
@@ -112,7 +112,7 @@ function TicketControl() {
   return (
     <React.Fragment>
       {currentlyVisibleState}
-      <button onClick={this.handleClick}>{buttonText}</button>
+      <button onClick={.handleClick}>{buttonText}</button>
     </React.Fragment>
   );
 
