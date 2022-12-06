@@ -1,9 +1,11 @@
-//New import!
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import NewTicketForm from './NewTicketForm';
-import EditTicketForm from './EditTicketForm';
 import TicketList from './TicketList';
-import TicketDetail from './TicketDetail'; 
+import EditTicketForm from './EditTicketForm';
+import TicketDetail from './TicketDetail';
+// new import!
+import db from './../firebase.js';
+import { collection, addDoc } from "firebase/firestore";  //Allows us to format a POST request to Firestore
 
 function TicketControl() {
 
@@ -35,11 +37,11 @@ function TicketControl() {
   }
 
   /* Handles the form submission process (for adding a new ticket to the list). */
-  const handleAddingNewTicketToList = (newTicket) => {   
-    // new code!
-    const newMainTicketList = mainTicketList.concat(newTicket);
-    // new code!
-    setMainTicketList(newMainTicketList);
+  const handleAddingNewTicketToList = async (newTicketData) => {
+    //await addDoc(collection(db, "tickets"), newTicketData);  //(One-line version of the next two lines) 
+    const collectionRef = collection(db, "tickets");
+    await addDoc(collectionRef, newTicketData);
+
     setFormVisibleOnPage(false);
   }
 
@@ -85,25 +87,25 @@ function TicketControl() {
     currentlyVisibleState = 
       <EditTicketForm     
         ticket = {selectedTicket} 
-        onEditTicket = {.handleEditingTicketInList} />;
+        onEditTicket = {handleEditingTicketInList} />;
     buttonText = "Return to Ticket List";
 
   } else if (selectedTicket != null) {
     currentlyVisibleState = 
       <TicketDetail 
         ticket={selectedTicket} 
-        onClickingDelete={.handleDeletingTicket}
-        onClickingEdit = {.handleEditClick} />;
+        onClickingDelete={handleDeletingTicket}
+        onClickingEdit = {handleEditClick} />;
     buttonText = "Return to Ticket List";
 
   } else if (formVisibleOnPage) {
-    currentlyVisibleState = <NewTicketForm onNewTicketCreation={.handleAddingNewTicketToList}  />;
+    currentlyVisibleState = <NewTicketForm onNewTicketCreation={handleAddingNewTicketToList}  />;
     buttonText = "Return to Ticket List";
 
   } else {
     currentlyVisibleState = 
       <TicketList 
-        onTicketSelection={.handleChangingSelectedTicket} 
+        onTicketSelection={handleChangingSelectedTicket} 
         // new code!
         ticketList={mainTicketList} />;
     buttonText = "Add Ticket"; 
@@ -112,7 +114,7 @@ function TicketControl() {
   return (
     <React.Fragment>
       {currentlyVisibleState}
-      <button onClick={.handleClick}>{buttonText}</button>
+      <button onClick={handleClick}>{buttonText}</button>
     </React.Fragment>
   );
 
