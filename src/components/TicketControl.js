@@ -27,8 +27,17 @@ function TicketControl() {
   useEffect(() => { 
     const unSubscribe = onSnapshot(
       collection(db, "tickets"), 
-      (collectionSnapshot) => {
-        // do something with ticket data
+      (collectionSnapshot) => {    //'collectionSnapshot' represents the returned collection from our Firebase DB. (Lsn 13).
+        const tickets = [];
+        collectionSnapshot.forEach((doc) => {    //"...We're actually calling a QuerySnapshot method..." (Lsn 13). 
+          tickets.push({
+            names: doc.data().names, 
+            location: doc.data().location, 
+            issue: doc.data().issue, 
+            id: doc.id    //A given Ticket's Id prop is created, and is set to the auto-generated ID from Firestore. (Lsn 13). 
+          });
+        });
+        setMainTicketList(tickets);
       }, 
       (error) => {
         // do something with error
