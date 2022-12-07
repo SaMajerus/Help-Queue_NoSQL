@@ -3,8 +3,7 @@ import NewTicketForm from './NewTicketForm';
 import TicketList from './TicketList';
 import EditTicketForm from './EditTicketForm';
 import TicketDetail from './TicketDetail';
-// new import!
-import { collection, addDoc, onSnapshot } from "firebase/firestore"; 
+import { collection, addDoc, doc, updateDoc, onSnapshot, deleteDoc } from "firebase/firestore";
 import db from './../firebase.js';
 
 function TicketControl() {
@@ -14,20 +13,15 @@ function TicketControl() {
   const [selectedTicket, setSelectedTicket] = useState(null);
   const [editing, setEditing] = useState(false);
 
-  // constructor(props) {
-  //   super(props);
-  //   this.state = {
-  //     formVisibleOnPage: false,
-  //     mainTicketList: [],
-  //     selectedTicket: null,
-  //     editing: false // new code
-  //   };  
-  // }
+  // new code!
+  const [error, setError] = useState(null);
 
   useEffect(() => { 
     const unSubscribe = onSnapshot(
       collection(db, "tickets"), 
-      (collectionSnapshot) => {    //'collectionSnapshot' represents the returned collection from our Firebase DB. (Lsn 13).
+
+      //This callback function handles creating an array of Tickets. 
+      (collectionSnapshot) => {    //'collectionSnapshot' represents the returned collection from our Firebase DB. (Lsn 13). 
         const tickets = [];
         collectionSnapshot.forEach((doc) => {    //"...We're actually calling a QuerySnapshot method..." (Lsn 13). 
           tickets.push({
@@ -40,14 +34,13 @@ function TicketControl() {
         setMainTicketList(tickets);
       }, 
       (error) => {
-        // do something with error
+        // new code!
+        setError(error.message);
       }
     );
 
     return () => unSubscribe();  //"Unsubscribe" in this context means to "stop the database listener" (Lsn 13).  
   }, []); 
-
-
 
 
 
@@ -111,7 +104,10 @@ function TicketControl() {
   let currentlyVisibleState = null;
   let buttonText = null; 
   
-  if (editing) {      
+  // new code!
+  if (error) {
+    currentlyVisibleState = <p>There was an error: {error}</p>;
+  } else if (editing) {         
     currentlyVisibleState = 
       <EditTicketForm     
         ticket = {selectedTicket} 
@@ -142,7 +138,8 @@ function TicketControl() {
   return (
     <React.Fragment>
       {currentlyVisibleState}
-      <button onClick={handleClick}>{buttonText}</button>
+      {/* New code below! */}
+      {error ? null : <button onClick={handleClick}>{buttonText}</button>}
     </React.Fragment>
   );
 
