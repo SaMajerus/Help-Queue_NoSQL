@@ -1,11 +1,12 @@
 import React from "react";
 import { auth } from './../firebase.js';
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
-import React, { useState } from "react";   //New import! 
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "firebase/auth"; //New import!
+import React, { useState } from "react"; 
 
 function SignIn(){ 
   const [signUpSuccess, setSignUpSuccess] = useState(null); 
-  const [signInSuccess, setSignInSuccess] = useState(null);  //New state variable  
+  const [signInSuccess, setSignInSuccess] = useState(null); 
+  const [signOutSuccess, setSignOutSuccess] = useState(null);  //New state variable  
 
   function doSignUp(event){ 
     event.preventDefault(); 
@@ -24,7 +25,6 @@ function SignIn(){
       });
   }
 
-  //New Sign-In function
   function doSignIn(event){ 
     event.preventDefault(); 
     const email = event.target.signinEmail.value; 
@@ -38,6 +38,16 @@ function SignIn(){
       .catch((error) => {
         //There was an error with Sign-In
         setSignInSuccess(`There was an error signing in: ${error.message}!`); 
+      });
+  }
+
+  //New [Sign-Out] function
+  function doSignOut(){
+    signOut(auth)
+      .then(function() {
+        setSignOutSuccess("You have successfully signed out!");
+      }).catch(function(error) {
+        setSignOutSuccess(`There was an error signing out: ${error.message}!`);
       });
   }
 
@@ -58,7 +68,6 @@ function SignIn(){
       </form>
 
       <h1>Sign In</h1>
-      {/* New sign in success message */}
       {signInSuccess}
       <form onSubmit={doSignIn}>
         <input
@@ -71,6 +80,12 @@ function SignIn(){
           placeholder='Password' />
         <button type='submit'>Sign in</button>
       </form>
+
+      {/* New sign out button*/}
+      <h1>Sign Out</h1>
+      {signOutSuccess}
+      <br />
+      <button onClick={doSignOut}>Sign out</button>
     </React.Fragment>
   );
 }
