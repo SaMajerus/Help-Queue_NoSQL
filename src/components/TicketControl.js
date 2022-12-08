@@ -4,7 +4,8 @@ import TicketList from './TicketList';
 import EditTicketForm from './EditTicketForm';
 import TicketDetail from './TicketDetail';
 import { collection, addDoc, doc, updateDoc, onSnapshot, deleteDoc } from "firebase/firestore";
-import { db, auth } from './../firebase.js';
+import { db, auth } from './../firebase.js'; 
+import { formatDistanceToNow } from 'date-fns';
 
 function TicketControl() {
 
@@ -12,39 +13,66 @@ function TicketControl() {
   const [mainTicketList, setMainTicketList] = useState([]);
   const [selectedTicket, setSelectedTicket] = useState(null);
   const [editing, setEditing] = useState(false);
-
-  // new code!
   const [error, setError] = useState(null);
 
   useEffect(() => { 
-    const unSubscribe = onSnapshot(
+    // new code below!
+    const queryByTimestamp = query(
       collection(db, "tickets"), 
-
-      //This callback function handles creating an array of Tickets. 
-      (collectionSnapshot) => {    //'collectionSnapshot' represents the returned collection from our Firebase DB. (Lsn 13). 
+      orderBy('timeOpen')
+    );
+    const unSubscribe = onSnapshot(
+      // new code below!
+      queryByTimestamp, 
+      (querySnapshot) => {
         const tickets = [];
-        collectionSnapshot.forEach((doc) => {    //"...We're actually calling a QuerySnapshot method..." (Lsn 13). 
+        querySnapshot.forEach((doc) => {
+          const timeOpen = doc.get('timeOpen', {serverTimestamps: "estimate"}).toDate();
+          const jsDate = new Date(timeOpen);
           tickets.push({
             names: doc.data().names, 
             location: doc.data().location, 
             issue: doc.data().issue, 
-            id: doc.id    //A given Ticket's Id prop is created, and is set to the auto-generated ID from Firestore. (Lsn 13). 
+            timeOpen: jsDate,
+            formattedWaitTime: formatDistanceToNow(jsDate),
+            id: doc.id
           });
         });
         setMainTicketList(tickets);
-      }, 
+      },
       (error) => {
-        // new code!
         setError(error.message);
       }
     );
 
-    return () => unSubscribe();  //"Unsubscribe" in this context means to "stop the database listener" (Lsn 13).  
-  }, []); 
+    return () => unSubscribe();
+  }, []);
+
+
+  /* "Side Effect": Updating 'formattedWaitTime' every minute. */ 
+  useEffect(() => {
+    function updateTicketElapsedWaitTime() {
+      const newMainTicketList = mainTicketList.map(ticket => {
+        const newFormattedWaitTime = formatDistanceToNow(ticket.timeOpen);
+        return {...ticket, formattedWaitTime: newFormattedWaitTime};
+      });
+      setMainTicketList(newMainTicketList);
+    }
+
+    const waitTimeUpdateTimer = setInterval(() =>
+      updateTicketElapsedWaitTime(), 
+      60000
+    );
+
+    return function cleanup() {
+      clearInterval(waitTimeUpdateTimer);
+    }
+  }, [mainTicketList]);
 
 
 
-  
+
+
   /* Handles mouse-click events. */
   const handleClick = () => {  
     if (selectedTicket != null) {
