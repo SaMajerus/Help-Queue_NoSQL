@@ -3,7 +3,7 @@ import NewTicketForm from './NewTicketForm';
 import TicketList from './TicketList';
 import EditTicketForm from './EditTicketForm';
 import TicketDetail from './TicketDetail';
-import { collection, addDoc, doc, updateDoc, onSnapshot, deleteDoc } from "firebase/firestore";
+import { collection, addDoc, doc, updateDoc, onSnapshot, deleteDoc, query, orderBy } from "firebase/firestore";
 import { db, auth } from './../firebase.js'; 
 import { formatDistanceToNow } from 'date-fns';
 

@@ -1,7 +1,7 @@
-import React from "react";
+import React, { useState } from "react"; 
 import { auth } from './../firebase.js';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "firebase/auth"; //New import!
-import React, { useState } from "react"; 
+
 
 function SignIn(){ 
   const [signUpSuccess, setSignUpSuccess] = useState(null); 
